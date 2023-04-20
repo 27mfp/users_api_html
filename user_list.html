@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>User List</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <button class="btn btn-primary mt-3 ml-3" onclick="goBack()">Back</button> <!-- Back button -->
+    <script>
+      function goBack() {
+        window.location.href = "index.html";
+      }
+    </script>
+    <div class="container mt-5">
+      <h1 class="mt-5 mb-5">User List</h1>
+      <table class="table table-striped table-bordered text-center">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody"></tbody>
+      </table>
+    </div>
+    <!-- Modal for User Details -->
+    <div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="userDetailsModalLabel">User Details</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="userDetailsBody">
+            <!-- User details will be populated here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const username = 'api';
+      const password = 'api';
+      const url = 'http://13.40.169.171/api/users?cache=' + Date.now(); // Add timestamp as cache-busting query parameter
+
+      fetch(url, {
+        headers: {
+          'Authorization': 'Basic ' + btoa(username + ':' + password)
+        },
+        cache: 'no-cache' // Add cache-busting option
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Error fetching user data: ' + response.status);
+          }
+          return response.json();
+        })
+        .then(responseData => {
+          // Check if responseData.data is an array
+          if (!Array.isArray(responseData.data)) {
+            throw new Error('Error fetching user data: Invalid response');
+          }
+          // Populate user table
+          const userTableBody = document.getElementById('userTableBody');
+          userTableBody.innerHTML = ''; // Clear table body
+          responseData.data.forEach(user => {
+            const row = document.createElement('tr');
+            const viewDetailsBtn = document.createElement('button'); // Create View Details button
+            viewDetailsBtn.className = 'btn btn-primary'; // Add Bootstrap class
+            viewDetailsBtn.textContent = 'View Details'; // Set button text
+            viewDetailsBtn.addEventListener('click', () => openUserDetails(user)); // Add click event listener
+            row.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.email}</td>
+                        <td></td>
+                    `;
+            row.querySelector('td:last-child').appendChild(viewDetailsBtn); // Append View Details button to Actions column
+            userTableBody.appendChild(row);
+          });
+        })
+        .catch(error => console.error(error));
+
+      function openUserDetails(user) {
+        // Populate user details in the modal
+        const userDetailsBody = document.getElementById('userDetailsBody');
+        userDetailsBody.innerHTML = `
+                <p><strong>ID:</strong> ${user.id}</p>
+                <p><strong>Name:</strong> ${user.name}</p>
+                <p><strong>Email:</strong> ${user.email}</p>
+                <p><strong>Phone Number:</strong> ${user.phone_number}</p>
+                <p><strong>Birthdate:</strong> ${user.birthdate}</p>
+                <p><strong>Bio:</strong> ${user.bio}</p>
+                <p><strong>City:</strong> ${user.city}</p>
+                <p><strong>Created At:</strong> ${user.created_at}</p>
+                <p><strong>Created At:</strong> ${user.created_at}</p>
+        `;
+
+        // Show the modal
+        const userDetailsModal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+        userDetailsModal.show();
+      }
+    </script>
+
+    <!-- JavaScript dependencies -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  </body>
+
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Update Users</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+      function editUser() {
+        var email = document.getElementById("email").value;
+        var userEmail = document.getElementById("userEmail").value; // added input field for user email
+        var name = document.getElementById("name").value;
+        var phoneNumber = parseInt(
+          document.getElementById("phone_number").value
+        );
+        var birthdate = document.getElementById("birthdate").value;
+        var bio = document.getElementById("bio").value;
+        var city = document.getElementById("city").value;
+
+        var credentials = btoa("api:api"); // encode basic auth credentials
+        var apiUrl = "http://13.40.169.171/api/users/" + userEmail; // append user email to the API endpoint
+
+        var user = {
+          email: email,
+          name: name,
+          phone_number: phoneNumber,
+          birthdate: birthdate,
+          bio: bio,
+          city: city,
+        };
+
+        $.ajax({
+          type: "PUT",
+          url: apiUrl,
+          headers: {
+            Authorization: "Basic " + credentials,
+            "Content-Type": "application/json",
+          },
+          data: JSON.stringify(user),
+          success: function (response) {
+            // Show success message using Bootstrap's alert component
+            var alertDiv = document.createElement("div");
+            alertDiv.className = "alert alert-success";
+            alertDiv.innerHTML = "User updated successfully! (refreshing...)";
+            document.getElementById("alertContainer").appendChild(alertDiv);
+            // Hide success message after 3 seconds
+            setTimeout(function () {
+              alertDiv.style.display = "none";
+              location.reload();
+            }, 2000);
+          },
+          error: function (error) {
+            // Show error message using Bootstrap's alert component
+            var alertDiv = document.createElement("div");
+            alertDiv.className = "alert alert-danger";
+            alertDiv.innerHTML = "Failed to update user: " + error.statusText;
+            document.getElementById("alertContainer").appendChild(alertDiv);
+            // Hide error message after 3 seconds
+            setTimeout(function () {
+              alertDiv.style.display = "none";
+            }, 3000);
+          },
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+    <button class="btn btn-primary mt-3 ml-3" onclick="goBack()">Back</button> <!-- Back button -->
+    <script>
+      function goBack() {
+        window.location.href = "index.html";
+      }
+    </script>
+    <div class="container">
+      <h1 class="mb-5 mt-5">Update User</h1>
+      <form onsubmit="return false;">
+        <div id="alertContainer"></div>
+        <div class="form-group">
+          <label for="userEmail">Old Email:</label>
+          <input type="email" id="userEmail" class="form-control" required />
+        </div>
+        <hr />
+        <div class="form-group">
+          <label for="email">New Email:</label>
+          <input type="email" id="email" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" id="name" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label for="phone_number">Phone Number:</label>
+          <input type="number" id="phone_number" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label for="birthdate">Birthdate:</label>
+          <input type="date" id="birthdate" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label for="bio">Bio:</label>
+          <textarea id="bio" class="form-control" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="city">City:</label>
+          <input type="text" id="city" class="form-control" required />
+        </div>
+        <button type="button" class="btn btn-primary" onclick="editUser()">
+          Update User
+        </button>
+      </form>
+    </div>
+
+    <!-- Bootstrap modal for success message -->
+    <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="successModalLabel">Success!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">User successfully updated!</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Include Bootstrap and jQuery scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <div class="container mt-5">
+      <h1>Users</h1>
+      <table id="data-table" class="table table-striped table-bordered mt-4"></table>
+    </div>
+    <script>
+      const url = "http://13.40.169.171/api/users";
+      const headersMap = {
+        id: "ID",
+        name: "Name",
+        email: "Email",
+        phone_number: "Phone Number",
+        birthdate: "Birthdate",
+        bio: "Bio",
+        city: "City",
+        created_at: "Created At",
+        updated_at: "Updated At",
+      };
+
+      fetch(url, {
+        headers: {
+          Authorization: "Basic " + btoa("api:api"),
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const table = document.querySelector("#data-table");
+          const headers = Object.keys(data.data[0]);
+
+          // Add table headers
+          const thead = document.createElement("thead");
+          thead.classList.add("thead-dark");
+          const tr = document.createElement("tr");
+          headers.forEach((header) => {
+            const th = document.createElement("th");
+            th.textContent = headersMap[header];
+            tr.appendChild(th);
+          });
+          thead.appendChild(tr);
+          table.appendChild(thead);
+
+          // Add table rows
+          const tbody = document.createElement("tbody");
+          data.data.forEach((item) => {
+            const tr = document.createElement("tr");
+            headers.forEach((header) => {
+              const td = document.createElement("td");
+              if (header === "birthdate") {
+                // Format date as dd-mm-yyyy
+                const date = new Date(item[header]);
+                td.textContent = date.toLocaleDateString("en-GB");
+              } else {
+                td.textContent = item[header];
+              }
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          });
+          table.appendChild(tbody);
+        })
+        .catch((error) => console.error(error));
+    </script>
+  </body>
+
+</html>

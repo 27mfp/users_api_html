@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>CRUD Operations</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 90vh;
+        background-color: #f8f8f8;
+        font-family: Arial, sans-serif;
+        flex-direction: column;
+        /* Added to align items in a column */
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+      }
+
+      .card {
+        background-color: #fff;
+        padding: 20px;
+        text-align: center;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease-in-out;
+        cursor: pointer;
+        text-decoration: none;
+        /* added to remove underlines */
+      }
+
+      .card:hover {
+        transform: scale(1.05);
+      }
+
+      .card h2 {
+        margin-top: 0;
+      }
+
+      .create {
+        background-color: #3498db;
+        color: #fff;
+      }
+
+      .read {
+        background-color: #2ecc71;
+        color: #fff;
+      }
+
+      .update {
+        background-color: #f1c40f;
+        color: #000;
+      }
+
+      .delete {
+        background-color: #e74c3c;
+        color: #fff;
+      }
+
+      .list {
+        background-color: grey;
+        color: #000;
+      }
+
+      .title {
+        text-align: center;
+        font-size: 36px;
+        /* Updated font size to 36px */
+        font-weight: bold;
+        margin-bottom: 20px;
+        font-family: "Helvetica", sans-serif;
+        /* Added custom font family */
+      }
+
+      .description {
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1 class="title">CRUD Operations</h1>
+    <div class="container">
+      <a href="create.html" class="card create">
+        <h2>Create Users</h2>
+        <p class="description">Click here to create new users</p>
+      </a>
+      <a href="read.html" class="card read">
+        <h2>Read Users</h2>
+        <p class="description">Click here to read existing users</p>
+      </a>
+      <a href="update.html" class="card update">
+        <h2>Update Users</h2>
+        <p class="description">Click here to update existing users</p>
+      </a>
+      <a href="delete.html" class="card delete">
+        <h2>Delete Users</h2>
+        <p class="description">Click here to delete existing users</p>
+      </a>
+      <a href="user_list.html" class="card list">
+        <h2>List Users</h2>
+        <p class="description">Click here to list a user</p>
+      </a>
+    </div>
+  </body>
+
+</html>

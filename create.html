@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Create User</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <button class="btn btn-primary mt-3 ml-3" onclick="goBack()">Back</button> <!-- Back button -->
+    <script>
+      function goBack() {
+        window.location.href = "index.html";
+      }
+    </script>
+    <div class="container mt-5">
+      <h1 class="mb-5 mt-5">Create User</h1>
+      <form id="userForm" class="needs-validation" novalidate>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" class="form-control" id="name" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" class="form-control" id="email" required />
+        </div>
+        <div class="form-group">
+          <label for="phone_number">Phone Number</label>
+          <input type="number" class="form-control" id="phone_number" required />
+        </div>
+        <div class="form-group">
+          <label for="birth_date">Birth Date</label>
+          <input type="date" class="form-control" id="birth_date" required />
+        </div>
+        <div class="form-group">
+          <label for="bio">Bio</label>
+          <textarea class="form-control" id="bio" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="city">City</label>
+          <input type="text" class="form-control" id="city" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+
+    <!-- Bootstrap modal for success message -->
+    <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="successModalLabel">Success!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">User successfully created!</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Include Bootstrap and jQuery scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+      document
+        .getElementById("userForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent form submission
+          event.stopPropagation(); // Stop event from bubbling up
+
+          // Validate form inputs
+          var form = document.getElementById("userForm");
+          if (!form.checkValidity()) {
+            form.classList.add("was-validated");
+            return;
+          }
+
+          // Gather form data
+          var name = document.getElementById("name").value;
+          var email = document.getElementById("email").value;
+          var phoneNumber = parseInt(
+            document.getElementById("phone_number").value
+          );
+          var birthDate = document.getElementById("birth_date").value;
+          var bio = document.getElementById("bio").value;
+          var city = document.getElementById("city").value;
+          // Create user object
+          var user = {
+            name: name,
+            email: email,
+            phone_number: phoneNumber,
+            birthDate: birthDate,
+            bio: bio,
+            city: city,
+          };
+
+          // Send POST request to API
+          fetch("http://13.40.169.171/api/users", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Basic " + btoa("api:api"),
+            },
+            body: JSON.stringify(user),
+          })
+            .then(function (response) {
+              if (response.ok) {
+                // Show the success modal
+                $('#successModal').modal('show');
+
+                // Set a timeout of 2 seconds (2000 milliseconds) before refreshing the page
+                setTimeout(function () {
+                  $('#successModal').modal('hide');
+                  location.reload();
+                }, 2000); // Specify the delay in milliseconds
+              } else {
+                // Show error message
+                alert("Error: " + response.statusText);
+              }
+            })
+            .catch(function (error) {
+              console.error("Error:", error);
+            });
+        });
+    </script>
+    <div class="container mt-5">
+      <h1>Users</h1>
+      <table id="data-table" class="table table-striped table-bordered mt-4"></table>
+    </div>
+    <script>
+      const url = "http://13.40.169.171/api/users";
+      const headersMap = {
+        id: "ID",
+        name: "Name",
+        email: "Email",
+        phone_number: "Phone Number",
+        birthdate: "Birthdate",
+        bio: "Bio",
+        city: "City",
+        created_at: "Created At",
+        updated_at: "Updated At",
+      };
+
+      fetch(url, {
+        headers: {
+          Authorization: "Basic " + btoa("api:api"),
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const table = document.querySelector("#data-table");
+          const headers = Object.keys(data.data[0]);
+
+          // Add table headers
+          const thead = document.createElement("thead");
+          thead.classList.add("thead-dark");
+          const tr = document.createElement("tr");
+          headers.forEach((header) => {
+            const th = document.createElement("th");
+            th.textContent = headersMap[header];
+            tr.appendChild(th);
+          });
+          thead.appendChild(tr);
+          table.appendChild(thead);
+
+          // Add table rows
+          const tbody = document.createElement("tbody");
+          data.data.forEach((item) => {
+            const tr = document.createElement("tr");
+            headers.forEach((header) => {
+              const td = document.createElement("td");
+              if (header === "birthdate") {
+                // Format date as dd-mm-yyyy
+                const date = new Date(item[header]);
+                td.textContent = date.toLocaleDateString("en-GB");
+              } else {
+                td.textContent = item[header];
+              }
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          });
+          table.appendChild(tbody);
+        })
+        .catch((error) => console.error(error));
+    </script>
+  </body>
+
+</html>
