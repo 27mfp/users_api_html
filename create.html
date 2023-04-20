@@ -125,8 +125,24 @@
                   location.reload();
                 }, 2000); // Specify the delay in milliseconds
               } else {
-                // Show error message
-                alert("Error: " + response.statusText);
+                response.text().then(function (errorText) {
+                  // Extract error information from response
+                  var errorStatus = response.status;
+                  var errorText = response.statusText;
+                  var customErrorMessage = errorText;
+
+                  // Show error message
+                  var errorAlert = document.createElement("div");
+                  errorAlert.className = "alert alert-danger mt-3";
+                  errorAlert.textContent =
+                    "Error (" +
+                    errorStatus +
+                    " " +
+                    errorText +
+                    "): " +
+                    customErrorMessage;
+                  form.appendChild(errorAlert);
+                });
               }
             })
             .catch(function (error) {

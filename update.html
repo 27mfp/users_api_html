@@ -44,7 +44,7 @@
             // Show success message using Bootstrap's alert component
             var alertDiv = document.createElement("div");
             alertDiv.className = "alert alert-success";
-            alertDiv.innerHTML = "User updated successfully! (refreshing...)";
+            alertDiv.innerHTML = "User updated successfully!";
             document.getElementById("alertContainer").appendChild(alertDiv);
             // Hide success message after 3 seconds
             setTimeout(function () {
@@ -78,7 +78,6 @@
     <div class="container">
       <h1 class="mb-5 mt-5">Update User</h1>
       <form onsubmit="return false;">
-        <div id="alertContainer"></div>
         <div class="form-group">
           <label for="userEmail">Old Email:</label>
           <input type="email" id="userEmail" class="form-control" required />
@@ -111,6 +110,7 @@
         <button type="button" class="btn btn-primary" onclick="editUser()">
           Update User
         </button>
+        <div id="alertContainer" class="mt-3"></div>
       </form>
     </div>
 
