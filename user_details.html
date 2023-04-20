@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>User Details</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  </head>
+
+  <body>
+    <div class="container mt-4">
+      <h1>User Details</h1>
+      <div id="userDetails" class="mt-3"></div>
+    </div>
+
+    <script>
+      const apiUrl = "http://35.176.189.56/api/users";
+      const authUsername = "api";
+      const authPassword = "api";
+
+      // Get user email from query parameter in URL
+      const queryParams = new URLSearchParams(window.location.search);
+      const userEmail = queryParams.get("email");
+
+      // Fetch and display user details based on email
+      fetchUserDetails(userEmail);
+
+      function fetchUserDetails(email) {
+        fetch(`${apiUrl}?email=${email}`, {
+          // Modify API endpoint to accept email as query parameter
+          headers: {
+            Authorization: "Basic " + btoa(authUsername + ":" + authPassword),
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const userDetails = document.getElementById("userDetails");
+            userDetails.innerHTML = "";
+
+            // Create HTML elements to display user details
+            const dl = document.createElement("dl");
+            dl.className = "row";
+            for (const key in data.data[0]) {
+              const dt = document.createElement("dt");
+              dt.className = "col-sm-3";
+              dt.textContent = key.charAt(0).toUpperCase() + key.slice(1); // Capitalize first letter of key
+              dl.appendChild(dt);
+
+              const dd = document.createElement("dd");
+              dd.className = "col-sm-9";
+              dd.textContent = data.data[0][key];
+              dl.appendChild(dd);
+            }
+            userDetails.appendChild(dl);
+          })
+          .catch((error) => console.error(error));
+      }
+    </script>
+  </body>
+
+</html>
