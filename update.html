@@ -11,17 +11,15 @@
     <script>
       function editUser() {
         var email = document.getElementById("email").value;
-        var userEmail = document.getElementById("userEmail").value; // added input field for user email
+        var userEmail = document.getElementById("userEmail").value;
         var name = document.getElementById("name").value;
-        var phoneNumber = parseInt(
-          document.getElementById("phone_number").value
-        );
+        var phoneNumber = parseInt(document.getElementById("phone_number").value);
         var birthdate = document.getElementById("birthdate").value;
         var bio = document.getElementById("bio").value;
         var city = document.getElementById("city").value;
 
-        var credentials = btoa("api:api"); // encode basic auth credentials
-        var apiUrl = "http://35.176.189.56/api/users/" + userEmail; // append user email to the API endpoint
+        var credentials = btoa("api:api");
+        var apiUrl = "http://35.176.189.56/api/users/" + userEmail;
 
         var user = {
           email: email,
@@ -53,10 +51,33 @@
             }, 2000);
           },
           error: function (error) {
+            var errorMessage;
+            switch (error.status) {
+              case 400:
+                errorMessage = "Failed to update user: Bad Request. Please check your input and try again.";
+                break;
+              case 401:
+                errorMessage = "Failed to update user: Unauthorized. Please check your credentials and try again.";
+                break;
+              case 403:
+                errorMessage = "Failed to update user: Forbidden. You do not have permission to perform this action.";
+                break;
+              case 404:
+                errorMessage = "Failed to update user: User not found. Please check the email and try again.";
+                break;
+              case 500:
+                errorMessage = "Failed to update user: Internal Server Error. Please try again later.";
+                break;
+              default:
+                errorMessage = "Failed to update user: " + error.statusText;
+                break;
+            }
+            // Remove existing error messages
+            document.getElementById("alertContainer").innerHTML = "";
             // Show error message using Bootstrap's alert component
             var alertDiv = document.createElement("div");
             alertDiv.className = "alert alert-danger";
-            alertDiv.innerHTML = "Failed to update user: " + error.statusText;
+            alertDiv.innerHTML = errorMessage;
             document.getElementById("alertContainer").appendChild(alertDiv);
             // Hide error message after 3 seconds
             setTimeout(function () {
@@ -66,6 +87,7 @@
         });
       }
     </script>
+
   </head>
 
   <body>
